@@ -9,7 +9,7 @@ class News(models.Model):
     text = models.TextField('Main article content')
     date = models.DateTimeField('Publication date', default=timezone.now)
     avtor = models.ForeignKey(User, verbose_name='Author', on_delete=models.CASCADE)
-    image = models.ImageField(upload_to='pictures/news_images', blank=True, null=True, default='default-img.jpg')
+    image = models.ImageField(upload_to='news_images', blank=True, null=True, default='default-img.jpg')
 
     views = models.PositiveIntegerField(default=0)
     likes = models.ManyToManyField(User, related_name='liked_news', blank=True)
