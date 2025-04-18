@@ -2,6 +2,7 @@ from django import forms
 from django.contrib.auth.models import User
 from .models import Profile
 from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import AuthenticationForm
 
 
 class UserRegisterForm(UserCreationForm):
@@ -34,6 +35,14 @@ class UserRegisterForm(UserCreationForm):
         model = User
         fields = ['email', 'username', 'password1', 'password2']
 
+    def __init__(self, *args, **kwargs):
+        super(UserRegisterForm, self).__init__(*args, **kwargs)
+        for field_name, field in self.fields.items():
+            field.widget.attrs.update({
+                'class': 'form-control bg-dark text-light border-secondary',
+                'placeholder': f'Enter your {field.label.lower()}'
+            })
+
 
 class UserUpdateForm(forms.ModelForm):
     username = forms.CharField(
@@ -53,6 +62,13 @@ class UserUpdateForm(forms.ModelForm):
         model = User
         fields = ['email', 'username']
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for name, field in self.fields.items():
+            existing = field.widget.attrs.get('class', '')
+            field.widget.attrs['class'] = f'{existing} form-control bg-dark text-light border-secondary'
+            field.widget.attrs['placeholder'] = f'Enter {field.label.lower()}'
+
     def save(self, commit = True):
         user = super().save(commit = False)
         
@@ -63,6 +79,17 @@ class UserUpdateForm(forms.ModelForm):
             profile.save()
 
         return user
+
+
+class CustomLoginForm(AuthenticationForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for name, field in self.fields.items():
+            existing_class = field.widget.attrs.get('class', '')
+            field.widget.attrs.update({
+                'class': f'{existing_class} form-control bg-dark text-light border-secondary',
+                'placeholder': f'Enter your {field.label.lower()}'
+            })
 
 
 class ProfileImageForm(forms.ModelForm):
@@ -85,5 +112,19 @@ class ProfileImageForm(forms.ModelForm):
     class Meta:
         model = Profile
         fields = ['img', 'gender', 'receive_newsletter']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for name, field in self.fields.items():
+            if isinstance(field.widget, forms.CheckboxInput):
+                field.widget.attrs['class'] = 'form-check-input'
+            elif isinstance(field.widget, forms.ClearableFileInput):
+                field.widget.attrs['class'] = 'form-control bg-dark text-light border-secondary'
+            else:
+                existing = field.widget.attrs.get('class', '')
+                field.widget.attrs['class'] = f'{existing} form-control bg-dark text-light border-secondary'
+                field.widget.attrs['placeholder'] = f'Enter {field.label.lower()}'
+
+
 
 

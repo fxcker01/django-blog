@@ -5,52 +5,80 @@
 {% endblock %}
 
 {% block content %}
-    <h1>Page of articles</h1>
-    {% for post in news %}
-    <div class="alert alert-light">
-        <h1>{{ post.title }}</h1>
-        <p>{{ post.text|striptags|truncatechars:200 }}</p>
-        <div class="row">
-            <div class="d-flex">
-                <div>
-                    <img src="{{ post.avtor.profile.img.url }}" alt="{{ post.avtor }}" class="user_images">
-                </div>
-                <div class="mt-2">
-                    <span class="d-block text-muted">Publication: {{ post.date|date:"d E Y в H:i" }}</span>
-                    <p><b>Author:</b> <a href="{% url 'user-news' post.avtor %}">{{ post.avtor }}</a></p>
+    <h1 class="mb-4 text-light fw-bold border-bottom pb-2 display-6">Articles</h1>
+
+    <div class="row">
+        {% for post in news %}
+            <div class="col-12 col-md-6 mb-4">
+                <div class="card h-100">
+                    {% if post.image %}
+                        <img src="{{ post.image.url }}" class="card-img-top object-fit-cover rounded-top" alt="{{ post.title }}">
+                    {% endif %}
+                    <div class="bg-dark card-body d-flex flex-column justify-content-between">
+                        <div>
+                            <h5 class="card-title text-light fw-semibold">{{ post.title }}</h5>
+                            <p class="card-text" style="color: #d1d1d1;">{{ post.text|striptags|truncatechars:150 }}</p>
+                        </div>
+
+                        <div class="mt-3">
+                            <div class="d-flex align-items-center mb-2">
+                                <img src="{{ post.avtor.profile.img.url }}" alt="{{ post.avtor }}" class="rounded-circle me-2" width="35" height="35" style="object-fit: cover;">
+                                <div class="d-flex flex-column small" style="color: #bbb;">
+                                    <span><i class="bi bi-person-circle me-1"></i>
+                                        <a href="{% url 'user-news' post.avtor %}" class="text-decoration-none" style="color: #00e0ff;">
+                                            {{ post.avtor }}
+                                        </a>
+                                    </span>
+                                    <span><i class="bi bi-calendar3 me-1"></i> {{ post.date|date:"d E Y \\a\\t H:i" }}</span>
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-between small" style="color: #bbb;">
+                                <span><i class="bi bi-eye me-1"></i> {{ post.views }} Views</span>
+                                <span><i class="bi bi-hand-thumbs-up me-1"></i>{{ post.total_likes }} Likes</span>
+                                <span><i class="bi bi-chat-left-text me-1"></i> {{ post.comments.count }} Comments</span>
+                            </div>
+                        </div>
+
+                        <a href="{% url 'news-detail' post.id %}" class="btn btn-outline-secondary mt-3">Read more</a>
+                    </div>
                 </div>
             </div>
-        </div>
-        <a href="{% url 'news-detail' post.id %}" class="btn btn-outline-warning mt-3">Read more</a>
+        {% endfor %}
     </div>
-    {% endfor %}
 
     {% if is_paginated %}
-        {% if page_obj.has_previous %}
-            <a href="{% url 'home' %}" class="btn btn-outline-danger">Return</a>
-            <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-outline-danger">Previous</a>
-        {% endif %}
+        <nav aria-label="Pagination" class="mt-4">
+            <ul class="pagination justify-content-center flex-wrap gap-2">
+                {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a href="{% url 'home' %}" class="btn btn-outline-secondary">Return</a>
+                    </li>
+                    <li class="page-item">
+                        <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-outline-secondary">Previous</a>
+                    </li>
+                {% endif %}
 
-        {% for num in page_obj.paginator.page_range %}
-            {% if num == page_obj.number %}
-                <button class="btn btn-outline-danger">{{ num }}</button>
-            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-                <a href="?page={{ num }}" class="btn btn-outline-danger">{{ num }}</a>
-            {% endif %}
-        {% endfor %}
+                {% for num in page_obj.paginator.page_range %}
+                    {% if num == page_obj.number %}
+                        <li class="page-item active" aria-current="page">
+                            <button class="btn btn-outline-primary text-light">{{ num }}</button>
+                        </li>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                        <li class="page-item">
+                            <a href="?page={{ num }}" class="btn btn-outline-secondary">{{ num }}</a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
 
-        {% if page_obj.has_next %}
-            <a href="?page={{ page_obj.next_page_number }}" class="btn btn-outline-danger">Next</a>
-            <a href="?page={{ page_obj.paginator.num_pages}}" class="btn btn-outline-danger">Last</a>
-        {% endif %}
+                {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a href="?page={{ page_obj.next_page_number }}" class="btn btn-outline-secondary">Next</a>
+                    </li>
+                    <li class="page-item">
+                        <a href="?page={{ page_obj.paginator.num_pages }}" class="btn btn-outline-secondary">Last</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
     {% endif %}
 {% endblock %}
-
-
-{% block aside_block %}
-    <div class="col-lg-3 sidebar">
-        {% include 'blog/sidebar.html' %}
-    </div>
-{% endblock %}
-
-

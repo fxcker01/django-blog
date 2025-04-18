@@ -20,7 +20,7 @@ def register(request):
         request, 
         'users/registration.html', 
         {
-            'title': 'Registration pageи',
+            'title': 'Registration page',
             'form': form
         },
     )
@@ -35,7 +35,7 @@ def profile(request):
         if profileForm.is_valid() and updateUserForm.is_valid():
             updateUserForm.save()
             profileForm.save()
-            messages.success(request, f'Ваш аккаунт был успешно обновлен!')
+            messages.success(request, f'Your account has been updated successfully.!')
             return redirect('profile')
     else:
         profileForm = ProfileImageForm(instance=request.user.profile)

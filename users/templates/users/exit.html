@@ -1,18 +1,21 @@
 {% extends 'blog/base.html' %}
 
 {% block title %}
-    Logout
+  Logout
 {% endblock %}
 
 {% block content %}
-    <h1>You have successfully logged out!</h1>
-    <a href="{% url 'user' %}">Log in</a>
+<div class="card bg-dark text-light p-5 mt-4 shadow-sm text-center">
+  <h2 class="fw-bold text-success mb-3">You have successfully logged out!</h2>
+  <p class="mb-4 text-secondary">We hope to see you again soon.</p>
+  <a href="{% url 'user' %}" class="btn btn-outline-success text-light px-4 py-2">
+    Log in again →
+  </a>
+</div>
 {% endblock %}
 
 {% block aside_block %}
-    <div class="col-lg-3 sidebar">
-        {% include 'blog/sidebar.html' %}
-    </div>
+<div class="col-lg-3 sidebar">
+  {% include 'blog/sidebar.html' %}
+</div>
 {% endblock %}
-
-

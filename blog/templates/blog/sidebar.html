@@ -1,18 +1,29 @@
-<h3>Side panel</h3>
-<p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Asperiores, inventore!</p>
 <div class="mb-4">
   <h4>Interesting articles</h4>
-  <img src="https://itproger.com/img/news/1589893627.jpg" class="img-thumbnail">
-  <p class="mt-2">For many, Python is a language for writing web projects, machine learning, or data analysis.</p>
-  <a href="#" target="_blank">
-    <button class="btn btn-warning">View</button>
-  </a>
-</div>
 
-<div class="mb-4">
-  <img src="https://itproger.com/img/news/1591879929.jpg" class="img-thumbnail">
-  <p class="mt-2">Why the Gobot engine is so popular among developers?</p>
-  <a href="#" target="_blank">
-    <button class="btn btn-warning">View</button>
-  </a>
+<div class="row gx-2">
+  {% for article in top_articles %}
+    <div class="col-12 col-md-6 col-lg-12 mt-3">
+        <div class="sidebar-card p-2 rounded bg-dark shadow-sm h-100">
+            {% if article.image %}
+              <img src="{{ article.image.url }}" class="img-thumbnail mb-2 w-100">
+            {% endif %}
+            <p class="mt-2">{{ article.title|truncatechars:60 }}</p>
+
+            <div class="d-flex flex-wrap justify-content-between text-secondary small mb-2">
+                <span><i class="bi bi-eye me-1"></i>{{ article.views }}</span>
+                <span><i class="bi bi-hand-thumbs-up me-1"></i>{{ article.total_likes }}</span>
+                <span><i class="bi bi-chat-left-text me-1"></i>{{ article.comments.count }}</span>
+                <span><i class="bi bi-calendar3 me-1"></i>{{ article.date|date:"d M Y" }}</span>
+            </div>
+
+            <a href="{% url 'news-detail' article.pk %}">
+              <button class="btn btn-outline-primary text-light btn-sm">View</button>
+            </a>
+        </div>
+    </div>
+    {% empty %}
+      <p>There are no popular articles yet.</p>
+    {% endfor %}
+  </div>
 </div>

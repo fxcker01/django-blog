@@ -1,37 +1,53 @@
 {% extends 'blog/base.html' %}
 
 {% block title %}
-    Profile
+  Profile
 {% endblock %}
 
 {% block content %}
-    <h1>Profile of {{ user.username }}</h1>
-    <div class="d-flex text-body-secondary pt-3">
-        <img class="bd-placeholder-img flex-shrink-0 me-2 rounded" width="64" height="64" src="{{ user.profile.img.url }}">
-            <div class="d-flex flex-column">
-                <div>
-                    <strong class="d-block text-gray-dark">@{{ user.username }}</strong>
-                </div>
-                {% if user.email %}
-                    <div>
-                        <b>Email:</b> {{ user.email }}
-                    </div>
-                {% endif %}
-            </div>
-        </p>
+<div class="card bg-dark text-light p-5 mt-4 shadow-sm">
+  <h2 class="fw-bold text-accent mb-4 display-6">Profile of {{ user.username }}</h2>
+
+  <div class="d-flex align-items-center gap-4 mb-4">
+    <img class="rounded-circle border border-secondary" width="80" height="80" style="object-fit: cover;"
+         src="{{ user.profile.img.url }}" alt="{{ user.username }}">
+    <div>
+      <p class="text-light mb-1"><strong>@{{ user.username }}</strong></p>
+      {% if user.email %}
+        <p class="text-light mb-0"><b>Email:</b> {{ user.email }}</p>
+      {% endif %}
     </div>
-    <form method="post" enctype="multipart/form-data" class="form-register mt-4">
-        {% csrf_token %}
-        {{ updateUserForm.as_p }}
-        {{ profileForm.as_p }}
-        <button class="btn btn-outline-warning" type="submit">Update</button>
-        <hr>
-    </form>
+  </div>
+
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {% for field in updateUserForm %}
+      <div class="mb-3">
+        <label for="{{ field.id_for_label }}" class="form-label text-light">{{ field.label }}</label>
+        {{ field }}
+        {% if field.errors %}
+          <div class="text-danger small mt-1">{{ field.errors }}</div>
+        {% endif %}
+      </div>
+    {% endfor %}
+
+    {% for field in profileForm %}
+      <div class="mb-3">
+        <label for="{{ field.id_for_label }}" class="form-label text-light">{{ field.label }}</label>
+        {{ field }}
+        {% if field.errors %}
+          <div class="text-danger small mt-1">{{ field.errors }}</div>
+        {% endif %}
+      </div>
+    {% endfor %}
+
+    <button class="btn btn-outline-success text-light px-4 mt-2" type="submit">Update</button>
+  </form>
+</div>
 {% endblock %}
 
 {% block aside_block %}
-    <div class="col-lg-3 sidebar">
-        {% include 'blog/sidebar.html' %}
-    </div>
+<div class="col-lg-3 sidebar">
+  {% include 'blog/sidebar.html' %}
+</div>
 {% endblock %}
-

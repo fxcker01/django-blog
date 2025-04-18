@@ -5,19 +5,31 @@
 {% endblock %}
 
 {% block content %}
-    <h1>User registration</h1>
-    <form method="post" class="form-register">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button class="btn btn-outline-warning" type="submit">Register</button>
-        <hr>
-        <p>Already have an account? <a href="{% url 'user' %}">Log in</a></p>
-    </form>
+<div class="card bg-dark text-light p-5 mt-4 shadow-sm">
+  <h2 class="fw-bold text-accent mb-4">User Registration</h2>
+
+  <form method="post">
+    {% csrf_token %}
+    {% for field in form %}
+      <div class="mb-3">
+        <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+        {{ field }}
+        {% if field.errors %}
+          <div class="text-danger small mt-1">{{ field.errors }}</div>
+        {% endif %}
+      </div>
+    {% endfor %}
+    <button class="btn btn-outline-secondary px-4" type="submit">Register</button>
+    <hr class="text-secondary mt-4">
+    <p class="text-light">Already have an account?
+      <a href="{% url 'user' %}" class="btn btn-link p-0 pb-1 text-decoration-none" style="color: #00e0ff;">Log in</a>
+    </p>
+  </form>
+</div>
 {% endblock %}
 
 {% block aside_block %}
-    <div class="col-lg-3 sidebar">
-        {% include 'blog/sidebar.html' %}
-    </div>
+<div class="col-lg-3 sidebar">
+    {% include 'blog/sidebar.html' %}
+</div>
 {% endblock %}
-

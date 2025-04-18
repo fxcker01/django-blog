@@ -4,12 +4,16 @@ from users import views as userViews
 from django.contrib.auth import views as authViews
 from django.conf import settings
 from django.conf.urls.static import static
+from users.forms import CustomLoginForm
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('reg/', userViews.register, name='reg'),
     path('profile/', userViews.profile, name='profile'),
-    path('user/', authViews.LoginView.as_view(template_name='users/user.html'), name='user'),
+    path('user/', authViews.LoginView.as_view(
+        template_name='users/user.html',
+        authentication_form=CustomLoginForm
+    ), name='user'),
     path('exit/', authViews.LogoutView.as_view(template_name='users/exit.html'), name='exit'),
 
     path('pass-reset/', authViews.PasswordResetView.as_view(template_name='users/pass_reset.html'), name='pass-reset'),

@@ -1,31 +1,200 @@
 {% extends 'blog/base.html' %}
 
 {% block title %}
-    {{ title }}
+  {{ title }}
 {% endblock %}
 
 {% block content %}
-<div class="alert alert-light">
-    <h2>{{ object.title }}</h2>
-    <p>{{ object.text|safe }}</p>
+<div class="card mt-3 rounded bg-dark text-light p-4 mb-5">
+  {% if news.image %}
+    <img src="{{ news.image.url }}" alt="{{ news.title }}" class="img-fluid rounded mb-4 w-100" style="max-height: 400px; object-fit: cover;">
+  {% endif %}
 
-    <div class="d-flex align-items-start mt-3">
-        <img src="{{ object.avtor.profile.img.url }}" alt="{{ object.avtor }}" class="user_images me-3">
-        <div>
-            <span class="d-block text-muted">Published: {{ object.date|date:"M d, Y at H:i" }}</span>
-            <p><b>Author:</b> <a href="{% url 'user-news' object.avtor %}">{{ object.avtor }}</a></p>
-        </div>
+  <h2 class="h4 fw-bold">{{ object.title }}</h2>
+
+    <div class="d-flex flex-wrap gap-3 text-secondary small mb-3">
+      <span><i class="bi bi-calendar3 me-1"></i>{{ object.date|date:"d E Y \\a\\t H:i" }}</span>
+      <span><i class="bi bi-eye me-1"></i>{{ object.views }} views</span>
+      <span>
+        <i class="bi bi-person-circle me-1"></i>
+        <a href="{% url 'user-news' object.avtor %}" class="text-decoration-none" style="color: #00e0ff;">{{ object.avtor }}</a>
+      </span>
     </div>
 
-    {% if object.avtor == user %}
-    <hr>
-    <a href="{% url 'news-update' object.id %}" class="btn btn-info me-2">Edit article</a>
-    <a href="{% url 'news-delete' object.id %}" class="btn btn-danger">Delete article</a>
+    <div class="article-body mt-3" style="color: #d1d1d1;">{{ object.text|safe }}</div>
+
+    <div class="d-flex flex-wrap gap-3 align-items-center mt-4 text-light small">
+      <span><i class="bi bi-chat-left-text me-1"></i>{{ object.comments.count }} comments</span>
+
+      <form method="post" action="{% url 'like-news' object.pk %}" class="d-inline">
+        {% csrf_token %}
+        {% if user in object.likes.all %}
+          <button class="btn btn-sm btn-secondary">
+            <i class="bi bi-hand-thumbs-up-fill me-1"></i> {{ object.total_likes }}
+          </button>
+        {% else %}
+          <button class="btn btn-sm btn-outline-secondary">
+            <i class="bi bi-hand-thumbs-up me-1"></i> {{ object.total_likes }}
+          </button>
+        {% endif %}
+      </form>
+    </div>
+
+    <!-- Admin buttons -->
+    {% if object.avtor == user or user.is_superuser or user.is_staff %}
+      <hr>
+      <a href="{% url 'news-update' object.id %}" class="btn btn-outline-primary text-light me-2 mt-2">Edit article</a>
+      <a href="{% url 'news-delete' object.id %}" class="btn btn-outline-danger text-light mt-2">Delete article</a>
     {% endif %}
+
 </div>
-{% endblock %}
-{% block aside_block %}
-    <div class="col-lg-3 sidebar">
-        {% include 'blog/sidebar.html' %}
+
+<hr class="text-secondary">
+<h4 class="text-light mb-4">Comments:</h4>
+
+<div class="main-comments">
+  {% for comment in comments %}
+  <div class="bg-dark rounded p-3 mb-3 text-light shadow-sm">
+    <div class="d-flex align-items-start">
+      <img src="{{ comment.name.profile.img.url }}" class="rounded-circle me-3" width="40" height="40" style="object-fit: cover;">
+      <div class="w-100">
+        <strong class="border-bottom">{{ comment.name }}</strong>
+        <p style="color: #ccc;">{{ comment.body }}</p>
+        <small style="color: #ccc;"><i class="bi bi-clock me-1"></i>{{ comment.created|date:"d E Y \\a\\t H:i" }}</small>
+
+        <div class="mt-2 d-flex flex-wrap gap-2 align-items-center">
+          <form method="post" action="{% url 'like-comment' comment.id %}">
+            {% csrf_token %}
+            <button class="btn btn-sm btn-outline-secondary">
+              <i class="bi bi-hand-thumbs-up me-1"></i>{{ comment.total_likes }}
+            </button>
+          </form>
+
+          <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="collapse" data-bs-target="#reply-form-{{ comment.id }}">
+            <i class="bi bi-reply"></i> Reply
+          </button>
+
+          {% if comment.name == user or user.is_superuser or user.is_staff %}
+            <a href="{% url 'edit-comment' comment.pk %}" class="btn btn-sm text-light btn-outline-primary">Edit</a>
+            <a href="{% url 'delete-comment' comment.pk %}" class="btn btn-sm text-light btn-outline-danger">Delete</a>
+          {% endif %}
+        </div>
+
+        <div id="reply-form-{{ comment.id }}" class="collapse mt-3">
+          <form method="post" action="{% url 'reply-comment' comment.id %}">
+            {% csrf_token %}
+            {{ form.body }}
+            <button class="btn btn-sm btn-outline-primary text-light p-2 mt-2">Send reply</button>
+          </form>
+        </div>
+
+        {% if comment.replies.all %}
+          <button class="btn btn-link btn-sm p-0 text-accent text-decoration-none mt-3"
+                  style="color: #00e0ff;"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#replies-{{ comment.id }}"
+                  aria-expanded="false"
+                  aria-controls="replies-{{ comment.id }}">
+            Show {{ comment.replies.count }} replies
+          </button>
+
+          <div id="replies-{{ comment.id }}" class="collapse mt-3">
+            {% for reply in comment.replies.all %}
+              <div class="mt-3 ms-5 ps-3 border-start">
+                <div class="d-flex align-items-start">
+                  <img src="{{ reply.name.profile.img.url }}" class="rounded-circle me-3" width="40" height="40" style="object-fit: cover;">
+                  <div class="w-100">
+                    <strong class="border-bottom">{{ reply.name }}</strong>
+                    <p class="mb-1" style="color: #ccc;">{{ reply.body }}</p>
+
+                    <div class="d-flex flex-wrap gap-2 align-items-center small">
+                      <small style="color: #999;">
+                        <i class="bi bi-clock me-1"></i>{{ reply.created|date:"d E Y \\a\\t H:i" }}
+                      </small>
+
+                      <form method="post" action="{% url 'like-comment' reply.id %}">
+                        {% csrf_token %}
+                        <button class="btn btn-sm p-1 btn-outline-secondary" title="Like">
+                          <i class="bi bi-hand-thumbs-up me-1"></i> {{ reply.total_likes }}
+                        </button>
+                      </form>
+
+                      {% if reply.name == user or user.is_superuser or user.is_staff %}
+                        <a href="{% url 'edit-comment' reply.pk %}" class="btn btn-sm btn-outline-primary p-1 text-light" title="Edit">
+                          <i class="bi bi-pencil-square"></i>
+                        </a>
+                        <a href="{% url 'delete-comment' reply.pk %}" class="btn btn-sm btn-outline-danger p-1 text-light" title="Delete">
+                          <i class="bi bi-trash"></i>
+                        </a>
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
     </div>
+  </div>
+  {% empty %}
+    <p class="text-light">No comments yet. Be the first!</p>
+  {% endfor %}
+</div>
+
+<hr class="text-secondary">
+
+{% if user.is_authenticated %}
+  <h4 class="text-light mb-3">Write a comment:</h4>
+  <form id="main-comment-form" method="post" action="{% url 'news-detail' object.pk %}">
+    {% csrf_token %}
+    <div class="mb-3">{{ form.body }}</div>
+    <button type="submit" class="btn btn-outline-secondary">Send</button>
+  </form>
+{% else %}
+  <p>To write a comment, <a href="{% url 'user' %}?next={{ request.path }}" class="btn btn-link p-0 pb-1 text-decoration-none" style="color: #00e0ff;">log in</a> to your account.</p>
+{% endif %}
 {% endblock %}
+
+{% block aside_block %}
+  <div class="col-lg-3 sidebar">
+    {% include 'blog/sidebar.html' %}
+  </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const form = document.getElementById("main-comment-form");
+    const commentsContainer = document.getElementById("main-comments");
+
+    if (form && commentsContainer) {
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        const formData = new FormData(form);
+
+        fetch(form.action, {
+          method: "POST",
+          body: formData,
+          headers: {
+            "X-Requested-With": "XMLHttpRequest",
+            "X-CSRFToken": form.querySelector('[name=csrfmiddlewaretoken]').value
+          }
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success && data.html) {
+            commentsContainer.insertAdjacentHTML("afterbegin", data.html);
+            form.reset();
+          }
+        })
+        .catch(err => console.error("AJAX error:", err));
+      });
+    }
+  });
+</script>
+{% endblock %}
+
+
+

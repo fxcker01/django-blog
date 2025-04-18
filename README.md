@@ -1,82 +1,63 @@
-# django-flexblog
+# 📰 Lumeyra — Tech News & Blog Platform
 
-A minimal, customizable Django-based blog engine with authentication, author profiles, article creation, pagination, and Bootstrap-adaptive layout. Ideal for personal use, quick startup projects, or client-ready blog solutions.
+> ⚠️ This is a private project under a proprietary license.  
+> Usage, modification, or distribution is strictly prohibited.
+
+---
+
+## 🧠 About the Project
+
+**Lumeyra** is a full-featured blogging platform focused on IT news, modern tech trends, and developer insights.  
+It supports full article publishing with images, code formatting, comments, replies, likes, user profiles, and mobile-friendly dark UI.
+
+---
 
 ## 🚀 Features
 
-- 🧑‍💻 User registration, login & profile
-- 📝 Post creation (news/articles)
-- 🖼 Author avatars
-- 📄 Pagination
-- 📱 Mobile responsive (Bootstrap 5)
-- 🔐 Access control for staff/superusers
-- 🚫 Admin panel can be disabled
-- 🌐 Deploy-ready for Railway
+- 📰 Article management and detail view
+- 💬 Comments with nested replies and like system
+- 👤 Author profiles with avatars
+- 🧑‍💻 Admin and staff editing access
+- 🔍 Sidebar with trending articles
+- 🎨 Syntax highlighting (Prism.js)
+- 🌓 Dark-themed responsive UI (TailwindCSS)
+- 🛡️ Django authentication system
+- ⚙️ Like system for articles and comments
+- 📱 Mobile-optimized layout
 
 ---
 
-## ⚙️ Getting Started
+## ⚙️ Tech Stack
 
-### 1. Clone the repo
-```bash
-git clone https://github.com/fxcker01/django-flexblog.git
-cd django-flexblog
-```
-
-### 2. Set up virtualenv (recommended)
-```bash
-python -m venv venv
-source venv/bin/activate  # or venv\Scripts\activate on Windows
-```
-
-### 3. Install dependencies
-```bash
-pip install -r requirements.txt
-```
-
-### 4. Run migrations and create superuser
-```bash
-python manage.py migrate
-python manage.py createsuperuser
-```
-
-### 5. Start the dev server
-```bash
-python manage.py runserver
-```
-
-Go to `http://127.0.0.1:8000/` 🎉
+- **Backend:** Django, Django ORM
+- **Frontend:** HTML, Bootstrap, Bootstrap Icons
+- **Database:** SQLite (development), PostgreSQL (production-ready)
+- **Deployment:** Railway + GitHub
+- **Syntax Highlighting:** Prism.js
+- **Auth:** Django built-in auth
 
 ---
 
-## 🌐 Deploy to Railway
-Add this to your `Procfile`:
-```procfile
-web: python manage.py collectstatic --noinput && gunicorn djangoBlog.wsgi:application --bind 0.0.0.0:$PORT
-```
+## 🌐 Live Demo
 
-Ensure `DEBUG = False`, and environment variables are set on Railway for secret key, allowed hosts, etc.
-
----
-
-## 📂 Project Structure
-```
-djangoBlog/
-├── blog/              # Blog logic and templates/blog/
-│   └── templates/blog/
-├── users/             # User auth/profile handling
-│   └── templates/users/
-├── blog/static/blog/  # Custom CSS
-├── media/             # Uploaded avatars
-├── requirements.txt
-├── Procfile
-├── LICENSE
-└── README.md
-```
+Check out the live version here:  
+🔗 [blog-production-f03b.up.railway.app](https://blog-production-f03b.up.railway.app)
 
 ---
 
 ## 📄 License
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+This project is licensed under a **Custom Proprietary License**.  
+Copying, distribution, or usage without permission is strictly prohibited.  
+See [LICENSE](LICENSE) for more information.
+
+---
+
+## 📬 Contact
+
+For demos, feedback, or licensing inquiries:  
+📧 [andriikushnir@gmail.com](mailto:andriikushnir@gmail.com)
+
+---
 
 Created by [fxcker01](https://github.com/fxcker01) 🖤

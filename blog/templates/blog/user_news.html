@@ -5,48 +5,99 @@
 {% endblock %}
 
 {% block content %}
-<div class="container py-4">
-    {% for post in news %}
-    <div class="alert alert-light mb-4 shadow-sm rounded">
-        <h1 class="h4">{{ post.title }}</h1>
-        <p class="text-muted">{{ post.text|striptags|truncatechars:200 }}</p>
-        <div class="row align-items-center mt-3">
-            <div class="d-flex gap-3 align-items-center">
-                <div>
-                    <img src="{{ post.avtor.profile.img.url }}" alt="{{ post.avtor }}"
-                         class="img-fluid rounded-circle border"
-                         style="width: 50px; height: 50px; object-fit: cover;">
-                </div>
-                <div class="small">
-                    <span class="text-muted d-block">Published: {{ post.date|date:"d E Y \a\t H:i" }}</span>
-                    <p class="mb-0"><strong>Author:</strong> <a href="{% url 'user-news' post.avtor %}" class="text-decoration-none">{{ post.avtor }}</a></p>
-                </div>
-            </div>
+
+<div class="pb-3">
+  <h1 class="display-10 fw-bold text-accent border-bottom pb-2">
+    {% if request.resolver_match.url_name == 'user-news' %}
+      Articles by {{ view.kwargs.username }}
+    {% else %}
+      Articles
+    {% endif %}
+  </h1>
+</div>
+
+<div class="row">
+  {% for post in news %}
+  <div class="col-12 col-md-6 mb-4">
+    <div class="card h-100 bg-dark text-white shadow-sm rounded-0">
+      {% if post.image %}
+      <img src="{{ post.image.url }}"
+           class="card-img-top object-fit-cover rounded-top"
+           style="height: 200px; object-fit: cover;"
+           alt="{{ post.title }}">
+      {% endif %}
+      <div class="card-body d-flex flex-column justify-content-between">
+        <div>
+          <h5 class="card-title fw-semibold text-accent">{{ post.title }}</h5>
+          <p class="card-text" style="color: #d1d1d1;">{{ post.text|striptags|truncatechars:150 }}</p>
         </div>
-        <a href="{% url 'news-detail' post.id %}" class="btn btn-outline-warning btn-sm mt-3">Read more</a>
+
+        <div class="mt-3">
+          <div class="d-flex align-items-center mb-2">
+            <img src="{{ post.avtor.profile.img.url }}"
+                 alt="{{ post.avtor }}"
+                 class="rounded-circle me-2"
+                 width="35" height="35"
+                 style="object-fit: cover;">
+            <div class="d-flex flex-column small" style="color: #bbb;">
+              <span>
+                <i class="bi bi-person-circle me-1"></i>
+                <a href="{% url 'user-news' post.avtor %}" class="text-decoration-none" style="color: #00e0ff;">
+                  {{ post.avtor }}
+                </a>
+              </span>
+              <span><i class="bi bi-calendar3 me-1"></i> {{ post.date|date:"d E Y \\a\\t H:i" }}</span>
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-between small" style="color: #bbb;">
+            <span><i class="bi bi-eye me-1"></i> {{ post.views }} Views</span>
+            <span><i class="bi bi-hand-thumbs-up me-1"></i> {{ post.total_likes }} Likes</span>
+            <span><i class="bi bi-chat-left-text me-1"></i> {{ post.comments.count }} Comments</span>
+          </div>
+        </div>
+
+        <a href="{% url 'news-detail' post.id %}" class="btn btn-outline-secondary mt-3" >Read more</a>
+      </div>
     </div>
+  </div>
+  {% endfor %}
+</div>
+
+{% if is_paginated %}
+<nav aria-label="Pagination" class="mt-4">
+  <ul class="pagination justify-content-center flex-wrap gap-2">
+    {% if page_obj.has_previous %}
+    <li class="page-item">
+      <a href="{% url 'home' %}" class="btn btn-outline-accent">Return</a>
+    </li>
+    <li class="page-item">
+      <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-outline-accent">Previous</a>
+    </li>
+    {% endif %}
+
+    {% for num in page_obj.paginator.page_range %}
+    {% if num == page_obj.number %}
+    <li class="page-item active" aria-current="page">
+      <button class="btn btn-accent">{{ num }}</button>
+    </li>
+    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+    <li class="page-item">
+      <a href="?page={{ num }}" class="btn btn-outline-accent">{{ num }}</a>
+    </li>
+    {% endif %}
     {% endfor %}
 
-    {% if is_paginated %}
-        <div class="d-flex justify-content-center gap-2 flex-wrap">
-            {% if page_obj.has_previous %}
-                <a href="?page=1" class="btn btn-outline-danger btn-sm">First</a>
-                <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-outline-danger btn-sm">Previous</a>
-            {% endif %}
-
-            {% for num in page_obj.paginator.page_range %}
-                {% if num == page_obj.number %}
-                    <span class="btn btn-danger btn-sm disabled">{{ num }}</span>
-                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-                    <a href="?page={{ num }}" class="btn btn-outline-danger btn-sm">{{ num }}</a>
-                {% endif %}
-            {% endfor %}
-
-            {% if page_obj.has_next %}
-                <a href="?page={{ page_obj.next_page_number }}" class="btn btn-outline-danger btn-sm">Next</a>
-                <a href="?page={{ page_obj.paginator.num_pages }}" class="btn btn-outline-danger btn-sm">Last</a>
-            {% endif %}
-        </div>
+    {% if page_obj.has_next %}
+    <li class="page-item">
+      <a href="?page={{ page_obj.next_page_number }}" class="btn btn-outline-accent">Next</a>
+    </li>
+    <li class="page-item">
+      <a href="?page={{ page_obj.paginator.num_pages }}" class="btn btn-outline-accent">Last</a>
+    </li>
     {% endif %}
-</div>
+  </ul>
+</nav>
+{% endif %}
+
 {% endblock %}
