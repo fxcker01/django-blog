@@ -10,10 +10,10 @@ env/
 .Python
 
 # Django stuff
-*.log
-db.sqlite3
-db.sqlite3-journal
-staticfiles/
+#*.log
+#db.sqlite3
+#db.sqlite3-journal
+#staticfiles/
 
 # Environment variables
 .env
